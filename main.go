@@ -1,43 +1,54 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
-func main(){
-	plantCapacities := []float64{30,30,30,60,60,100}
+func main() {
+	plantCapacities := []float64{30, 30, 30, 60, 60, 100}
 
 	activePlants := []int{0, 1}
 
 	gridLoad := 75.
 
-	fmt.Println("1) Generate Power Plant Report")
-	fmt.Println("2) Generate Power Grid Report")
-	fmt.Println("Please choose an option")
+	if option, err := requestOption(); err == nil {
+		fmt.Println("")
 
-	var option string
-
-	fmt.Scanln(&option)
-
-	switch option{
-	case "1":
-		generatePlantCapacityReport(plantCapacities...)
-	case "2":
-		generatePowerGridReport(activePlants,plantCapacities,gridLoad)
-	default:
-		{
-			fmt.Printf("Unkown option, no action taken")
+		switch option {
+		case "1":
+			generatePlantCapacityReport(plantCapacities...)
+		case "2":
+			generatePowerGridReport(activePlants, plantCapacities, gridLoad)
 		}
+	} else {
+		fmt.Println(err.Error())
 	}
 }
 
-func generatePlantCapacityReport(plantCapacities... float64) {
-	for index, capacity := range plantCapacities{
+func requestOption() (option string, err error) {
+	fmt.Println("1) Generate Power Plant Report")
+	fmt.Println("2) Generate Power Grid Report")
+	fmt.Print("Please choose an option: ")
+
+	fmt.Scanln(&option)
+
+	if option != "1" && option != "2" {
+		err = errors.New("Invalid option selected")
+	}
+
+	return
+}
+
+func generatePlantCapacityReport(plantCapacities ...float64) {
+	for index, capacity := range plantCapacities {
 		fmt.Printf("Plant %d capacity: %.0f\n", index, capacity)
 	}
 }
 
-func generatePowerGridReport(activePlants []int, plantCapacities []float64, gridLoad float64){
+func generatePowerGridReport(activePlants []int, plantCapacities []float64, gridLoad float64) {
 	capacity := 0.
-	for _, plantId := range activePlants{
+	for _, plantId := range activePlants {
 		capacity += plantCapacities[plantId]
 	}
 	fmt.Printf("%-20s%.0f\n", "Capacity:", capacity)
